@@ -2,3 +2,4 @@
 test/build/
 test/docs/
 test/fixtures/repo
+.env
