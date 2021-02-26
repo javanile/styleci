@@ -1,0 +1,37 @@
+#!/usr/bin/env php
+<?php
+
+require_once '/root/.composer/vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+$smtp = parse_url(getenv('MAIL_SMTP'));
+parse_str(@$smtp['query'], $smtp['params']);
+
+$mail = new PHPMailer(true);
+
+$mail->IsSMTP();
+$mail->Mailer = "smtp";
+$mail->CharSet = 'UTF-8';
+
+$mail->Host = $smtp['host'];
+$mail->SMTPDebug = boolval(@$smtp['params']['debug']);
+$mail->SMTPAuth = true; #boolval(@$smtp['params']['auth']);
+$mail->SMTPSecure = 'tls'; @$smtp['params']['secure'];
+$mail->Port = $smtp['port'] ?: 25;
+$mail->Username = @$smtp['user'];
+$mail->Password = @$smtp['pass'];
+
+$mail->isHTML(false);
+$mail->Subject = $argv[1] ?: '(no subject)';
+$mail->Body = file_get_contents('php://stdin');
+$mail->setFrom(@$smtp['user']);
+$mail->AddAddress($argv[2] ?: @$smtp['user']);
+
+try {
+    $mail->send();
+    echo "Mail sent!\n";
+} catch (Exception $e) {
+    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}\n";
+}
