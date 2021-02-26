@@ -9,6 +9,8 @@ use PHPMailer\PHPMailer\Exception;
 $smtp = parse_url(getenv('MAIL_SMTP'));
 parse_str(@$smtp['query'], $smtp['params']);
 
+var_dump($smtp);
+
 $mail = new PHPMailer(true);
 
 $mail->IsSMTP();
